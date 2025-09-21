@@ -23,7 +23,8 @@ const Story = () => {
   // Detectar si es dispositivo móvil
   useEffect(() => {
     const checkMobile = () => {
-      const mobileCheck = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+      const mobileCheck = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent) ||
+                         ('ontouchstart' in window) ||
                          window.innerWidth <= 768;
       setIsMobile(mobileCheck);
     };
@@ -170,11 +171,11 @@ const Story = () => {
       />
 
       {/* Indicador de progreso con línea temporal */}
-      <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-10">
-        <div className="flex flex-col items-center space-y-2">
+      <div className={`fixed ${isMobile ? 'top-4' : 'top-6'} left-1/2 transform -translate-x-1/2 z-10`}>
+        <div className="flex flex-col items-center space-y-1">
           {/* Línea temporal */}
           <motion.div
-            className="text-xs text-gray-400 font-light"
+            className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-400 font-light`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
@@ -183,20 +184,20 @@ const Story = () => {
           </motion.div>
 
           {/* Indicadores de capítulo */}
-          <div className="flex space-x-3">
+          <div className={`flex ${isMobile ? 'space-x-2' : 'space-x-3'}`}>
             {chapters.map((_, index) => (
               <motion.button
                 key={index}
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{
-                  scale: index === currentChapter ? 1.3 : index < currentChapter ? 1.1 : 0.9,
+                  scale: index === currentChapter ? (isMobile ? 1.4 : 1.3) : index < currentChapter ? (isMobile ? 1.2 : 1.1) : (isMobile ? 1.0 : 0.9),
                   rotate: index <= currentChapter ? 0 : -180,
                   backgroundColor: index <= currentChapter ? '#fbbf24' : '#4b5563'
                 }}
-                whileHover={{ scale: 1.4 }}
-                whileTap={{ scale: 1.2 }}
+                whileHover={!isMobile ? { scale: 1.4 } : {}}
+                whileTap={{ scale: isMobile ? 1.3 : 1.2 }}
                 transition={{ duration: 0.4, type: "spring", stiffness: 200 }}
-                className="w-4 h-4 rounded-full cursor-pointer border-2 border-white/20 shadow-lg relative overflow-hidden"
+                className={`${isMobile ? 'w-5 h-5' : 'w-4 h-4'} rounded-full cursor-pointer border-2 border-white/20 shadow-lg relative overflow-hidden`}
                 onClick={() => setCurrentChapter(index)}
               >
                 {/* Efecto de brillo sutil */}
@@ -224,7 +225,7 @@ const Story = () => {
         </motion.div>
       )}
 
-      <div className="max-w-md w-full">
+      <div className={`max-w-md w-full ${isMobile ? 'px-2' : 'px-4'}`}>
         <AnimatePresence mode="wait">
           <motion.div
             key={currentChapter}
@@ -308,7 +309,7 @@ const Story = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: chapter.title ? 0.6 : 0.4 }}
-              className="text-lg text-gray-300 mb-8 leading-relaxed px-4 min-h-[120px] flex items-center"
+              className={`${isMobile ? 'text-base' : 'text-lg'} text-gray-300 mb-8 leading-relaxed px-2 min-h-[120px] flex items-center`}
             >
               <p className="text-center">
                 {displayedText}
@@ -328,7 +329,7 @@ const Story = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: [0, 0.6, 0] }}
                 transition={{ duration: 3, repeat: Infinity, delay: 3, repeatDelay: 8 }}
-                className="text-xs text-gray-500 text-center mb-4 font-light"
+                className={`${isMobile ? 'text-xs px-4' : 'text-xs'} text-gray-500 text-center mb-4 font-light`}
               >
                 Psss... en este capítulo hay un secreto, ¡búscalo! Desbloquea un nuevo capítulo
               </motion.p>
@@ -384,48 +385,48 @@ const Story = () => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.5 }}
-                    className="flex flex-col items-center space-y-2 mt-6"
+                    className="flex flex-col items-center space-y-3 mt-8 px-4"
                   >
                     {/* Indicadores de swipe */}
-                    <div className="flex items-center space-x-4 text-gray-400">
+                    <div className="flex items-center justify-center space-x-6 text-gray-400">
                       {currentChapter > 0 && (
                         <motion.div
                           animate={{ x: [-5, 0, -5] }}
                           transition={{ duration: 2, repeat: Infinity }}
-                          className="flex items-center space-x-1"
+                          className="flex flex-col items-center space-y-1"
                         >
-                          <span className="text-sm">←</span>
-                          <span className="text-xs">Desliza para volver</span>
+                          <span className="text-lg">←</span>
+                          <span className="text-xs text-center">Volver</span>
                         </motion.div>
                       )}
                       {!isLastChapter && (
                         <motion.div
                           animate={{ x: [5, 0, 5] }}
                           transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-                          className="flex items-center space-x-1"
+                          className="flex flex-col items-center space-y-1"
                         >
-                          <span className="text-xs">Desliza para continuar</span>
-                          <span className="text-sm">→</span>
+                          <span className="text-lg">→</span>
+                          <span className="text-xs text-center">Continuar</span>
                         </motion.div>
                       )}
                     </div>
 
-                    {/* Indicador visual de swipe */}
-                    <div className="flex items-center space-x-2">
+                    {/* Indicador visual de swipe mejorado */}
+                    <div className="flex items-center space-x-3">
                       <motion.div
-                        animate={{ scale: [1, 1.2, 1] }}
+                        animate={{ scale: [1, 1.3, 1] }}
                         transition={{ duration: 1.5, repeat: Infinity }}
-                        className="w-2 h-2 bg-yellow-400 rounded-full"
+                        className="w-3 h-3 bg-yellow-400 rounded-full"
                       />
                       <motion.div
-                        animate={{ scale: [1, 1.2, 1] }}
+                        animate={{ scale: [1, 1.3, 1] }}
                         transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
-                        className="w-2 h-2 bg-yellow-400 rounded-full"
+                        className="w-3 h-3 bg-yellow-400 rounded-full"
                       />
                       <motion.div
-                        animate={{ scale: [1, 1.2, 1] }}
+                        animate={{ scale: [1, 1.3, 1] }}
                         transition={{ duration: 1.5, repeat: Infinity, delay: 0.6 }}
-                        className="w-2 h-2 bg-yellow-400 rounded-full"
+                        className="w-3 h-3 bg-yellow-400 rounded-full"
                       />
                     </div>
                   </motion.div>
@@ -519,14 +520,14 @@ const Story = () => {
             className="fixed inset-0 bg-gradient-to-br from-pink-900/95 via-purple-900/95 to-yellow-900/95 flex items-center justify-center z-50"
             onClick={() => setKiaraSecret(false)}
           >
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0, rotate: -10 }}
-              animate={{ scale: 1, opacity: 1, rotate: 0 }}
-              exit={{ scale: 0.8, opacity: 0, rotate: 10 }}
-              transition={{ type: "spring", stiffness: 200, damping: 20 }}
-              className="bg-white/10 backdrop-blur-sm p-8 rounded-2xl max-w-md mx-4 text-center shadow-2xl border border-white/20"
-              onClick={(e) => e.stopPropagation()}
-            >
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0, rotate: -10 }}
+                animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                exit={{ scale: 0.8, opacity: 0, rotate: 10 }}
+                transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                className={`${isMobile ? 'p-6 mx-2' : 'p-8 mx-4'} bg-white/10 backdrop-blur-sm rounded-2xl max-w-md text-center shadow-2xl border border-white/20`}
+                onClick={(e) => e.stopPropagation()}
+              >
               {/* Imagen de Kiara */}
               <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
@@ -537,8 +538,8 @@ const Story = () => {
                 <Image
                   src="/story/Kiara.png"
                   alt="Kiara"
-                  width={250}
-                  height={250}
+                  width={isMobile ? 200 : 250}
+                  height={isMobile ? 200 : 250}
                   className="w-full h-auto rounded-xl shadow-lg mx-auto"
                   priority
                 />
@@ -555,7 +556,7 @@ const Story = () => {
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
-                className="text-6xl mb-4"
+                className={`${isMobile ? 'text-5xl mb-3' : 'text-6xl mb-4'}`}
               >
                 💖
               </motion.div>
@@ -565,7 +566,7 @@ const Story = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="text-2xl font-bold text-white mb-4"
+                className={`${isMobile ? 'text-xl font-bold text-white mb-3' : 'text-2xl font-bold text-white mb-4'}`}
               >
                 ¡Te amamos mucho!
               </motion.h2>
@@ -596,10 +597,10 @@ const Story = () => {
               ))}
 
               <motion.button
-                whileHover={{ scale: 1.05 }}
+                whileHover={!isMobile ? { scale: 1.05 } : {}}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setKiaraSecret(false)}
-                className="mt-6 bg-gradient-to-r from-pink-500 to-yellow-500 hover:from-pink-600 hover:to-yellow-600 text-white font-semibold py-3 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl"
+                className={`${isMobile ? 'mt-4 py-3 px-6 text-sm' : 'mt-6 py-3 px-8'} bg-gradient-to-r from-pink-500 to-yellow-500 hover:from-pink-600 hover:to-yellow-600 text-white font-semibold rounded-full transition-all duration-300 shadow-lg hover:shadow-xl`}
               >
                 💕 Volver
               </motion.button>
