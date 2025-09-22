@@ -18,8 +18,8 @@ const Story = () => {
   const [secretChapter, setSecretChapter] = useState(false);
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
   const [kiaraSecret, setKiaraSecret] = useState(false);
-  const [lastTap, setLastTap] = useState<number>(0);
   const [firstTapDetected, setFirstTapDetected] = useState(false);
+  const [secretTouchTimer, setSecretTouchTimer] = useState(false);
 
   // Detectar si es dispositivo móvil
   useEffect(() => {
@@ -122,22 +122,26 @@ const Story = () => {
     }
   };
 
-  // Función para doble toque (capítulo Kiara)
-  const handleDoubleTap = () => {
-    if (currentChapter === 6) { // Solo en el último capítulo
-      const now = Date.now();
+  // Función para toque secreto (mantener pulsado 1 segundo)
+  const handleSecretTouch = () => {
+    if (currentChapter === 6 && !secretTouchTimer) { // Solo en el último capítulo
+      setSecretTouchTimer(true);
+      setFirstTapDetected(true);
 
-      if (now - lastTap < 800) { // 800ms para doble toque (aún más tiempo)
-        setKiaraSecret(true);
-        setFirstTapDetected(false); // Resetear el indicador
-      } else {
-        // Primer toque detectado
-        setFirstTapDetected(true);
-        setTimeout(() => setFirstTapDetected(false), 800); // Ocultar después de 800ms
-      }
-
-      setLastTap(now);
+      // Después de 1 segundo, activar el secreto
+      setTimeout(() => {
+        if (firstTapDetected) { // Si aún está pulsando
+          setKiaraSecret(true);
+          setFirstTapDetected(false);
+        }
+        setSecretTouchTimer(false);
+      }, 1000); // 1 segundo
     }
+  };
+
+  const handleSecretTouchEnd = () => {
+    setFirstTapDetected(false);
+    setSecretTouchTimer(false);
   };
 
   // Modo inmersivo para móviles
@@ -272,16 +276,26 @@ const Story = () => {
                 height={300}
                 className="w-full h-auto rounded-lg shadow-lg mx-auto cursor-pointer"
                 priority
-                onMouseDown={handleMouseDown}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
-                onClick={handleDoubleTap}
+                onMouseDown={() => {
+                  handleMouseDown();
+                  handleSecretTouch();
+                }}
+                onMouseUp={() => {
+                  handleMouseUp();
+                  handleSecretTouchEnd();
+                }}
+                onMouseLeave={() => {
+                  handleMouseUp();
+                  handleSecretTouchEnd();
+                }}
                 onTouchStart={(e) => {
                   handleMouseDown();
+                  handleSecretTouch();
                   onTouchStart(e);
                 }}
                 onTouchEnd={(e) => {
                   handleMouseUp();
+                  handleSecretTouchEnd();
                   onTouchEnd();
                 }}
               />
@@ -339,7 +353,7 @@ const Story = () => {
                 transition={{ duration: 2, repeat: Infinity, delay: 2, repeatDelay: 3 }}
                 className={`${isMobile ? 'text-xs px-4' : 'text-xs'} text-gray-500 text-center mb-4 font-light`}
               >
-                💡 ¡Secreto oculto! Toca dos veces la imagen para desbloquear
+                💡 ¡Secreto oculto! Mantén pulsado la imagen por 1 segundo
               </motion.p>
             )}
 
@@ -414,7 +428,7 @@ const Story = () => {
                           className="flex flex-col items-center space-y-1"
                         >
                           <span className="text-lg">→</span>
-                          <span className="text-xs text-center">Continuar</span>
+                          <span className="text-xs text-center">Deslizá</span>
                         </motion.div>
                       )}
                     </div>
@@ -518,21 +532,39 @@ const Story = () => {
         </motion.div>
       )}
 
-      {/* Indicador de primer toque del doble toque */}
+      {/* Indicador de toque secreto (mantener pulsado) */}
       {firstTapDetected && currentChapter === 6 && (
         <motion.div
-          className="fixed inset-0 bg-blue-500/30 flex items-center justify-center z-30 pointer-events-none"
+          className="fixed inset-0 bg-gradient-to-br from-purple-500/40 to-pink-500/40 flex items-center justify-center z-30 pointer-events-none"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
           <motion.div
-            className="bg-blue-600 px-6 py-3 rounded-full text-white text-sm font-semibold"
-            initial={{ scale: 0.8, y: 20 }}
-            animate={{ scale: 1, y: 0 }}
-            exit={{ scale: 0.8, y: -20 }}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 px-8 py-4 rounded-2xl text-white text-sm font-semibold shadow-2xl border-2 border-white/30"
+            initial={{ scale: 0.8, y: 20, rotate: -5 }}
+            animate={{ scale: 1, y: 0, rotate: 0 }}
+            exit={{ scale: 0.8, y: -20, rotate: 5 }}
+            transition={{ type: "spring", stiffness: 200 }}
           >
-            👆 Toca nuevamente para el secreto
+            <div className="flex items-center space-x-2">
+              <motion.span
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              >
+                👆
+              </motion.span>
+              <span>Mantén pulsado para el secreto</span>
+              <motion.div
+                className="flex space-x-1"
+                animate={{ opacity: [0.3, 1, 0.3] }}
+                transition={{ duration: 1, repeat: Infinity }}
+              >
+                <div className="w-1 h-1 bg-white rounded-full"></div>
+                <div className="w-1 h-1 bg-white rounded-full"></div>
+                <div className="w-1 h-1 bg-white rounded-full"></div>
+              </motion.div>
+            </div>
           </motion.div>
         </motion.div>
       )}
