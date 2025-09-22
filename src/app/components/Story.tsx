@@ -22,8 +22,9 @@ const Story = () => {
   const [secretTouchTimer, setSecretTouchTimer] = useState(false);
   const [secretCode, setSecretCode] = useState('');
   const [showCodeInput, setShowCodeInput] = useState(false);
+  const [transformedLetters, setTransformedLetters] = useState<Set<string>>(new Set());
 
-  // Mapa de posiciones donde las letras se transforman en números
+  // Mapa de posiciones donde las letras se transforman en números temporalmente
   const letterTransformations: { [key: number]: { [position: number]: string } } = {
     0: { 6: '1', 8: '3' }, // Capítulo 1: "Hace t[r]ece" → "Hace t[1]ece", "Hace tre[c]e" → "Hace tre[3]e"
     1: { 20: '0' }, // Capítulo 2: "charlas infi[n]itas" → "charlas infi[0]itas"
@@ -48,16 +49,34 @@ const Story = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Efecto de typing para el texto
+  // Efecto de typing para el texto con transformaciones temporales
   useEffect(() => {
     setDisplayedText('');
     setShowButtons(false);
     setShowCodeInput(false);
+    setTransformedLetters(new Set());
     const text = chapters[currentChapter].text;
     let i = 0;
     const timer = setInterval(() => {
       if (i < text.length) {
         setDisplayedText(text.slice(0, i + 1));
+
+        // Verificar si esta posición debe transformarse
+        const transformations = letterTransformations[currentChapter];
+        if (transformations && transformations[i]) {
+          const letterKey = `${currentChapter}-${i}`;
+          setTransformedLetters(prev => new Set([...prev, letterKey]));
+
+          // Después de 1 segundo, quitar la transformación
+          setTimeout(() => {
+            setTransformedLetters(prev => {
+              const newSet = new Set(prev);
+              newSet.delete(letterKey);
+              return newSet;
+            });
+          }, 1000);
+        }
+
         i++;
       } else {
         clearInterval(timer);
@@ -367,12 +386,14 @@ const Story = () => {
             >
               <p className="text-center">
                 {displayedText.split('').map((char, index) => {
+                  const letterKey = `${currentChapter}-${index}`;
+                  const isTransformed = transformedLetters.has(letterKey);
                   const transformations = letterTransformations[currentChapter];
                   const shouldTransform = transformations && transformations[index];
                   const transformedChar = shouldTransform ? transformations[index] : char;
                   const isLastChar = index === displayedText.length - 1;
 
-                  if (shouldTransform) {
+                  if (isTransformed && shouldTransform) {
                     return (
                       <motion.span
                         key={index}
