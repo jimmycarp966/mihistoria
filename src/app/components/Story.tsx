@@ -23,6 +23,17 @@ const Story = () => {
   const [secretCode, setSecretCode] = useState('');
   const [showCodeInput, setShowCodeInput] = useState(false);
 
+  // Mapa de posiciones donde las letras se transforman en números
+  const letterTransformations: { [key: number]: { [position: number]: string } } = {
+    0: { 6: '1', 8: '3' }, // Capítulo 1: "Hace t[r]ece" → "Hace t[1]ece", "Hace tre[c]e" → "Hace tre[3]e"
+    1: { 20: '0' }, // Capítulo 2: "charlas infi[n]itas" → "charlas infi[0]itas"
+    2: { 15: '8' }, // Capítulo 3: "tantas c[o]sas" → "tantas c[8]sas"
+    3: { 5: '2' }, // Capítulo 4: "Hub[o] abrazos" → "Hub[2] abrazos"
+    4: { 25: '0' }, // Capítulo 5: "como a[n]tes" → "como a[0]tes"
+    5: { 50: '1' }, // Capítulo 6: "mundo de f[l]ores" → "mundo de f[1]ores"
+    6: { 75: '2' }  // Capítulo 7: "siempre ser[a]s" → "siempre ser[2]s"
+  };
+
   // Detectar si es dispositivo móvil
   useEffect(() => {
     const checkMobile = () => {
@@ -155,7 +166,7 @@ const Story = () => {
 
   // Verificar código secreto
   const handleCodeSubmit = () => {
-    if (secretCode === '14082012') {
+    if (secretCode === '13082012') {
       setKiaraSecret(true);
       setShowCodeInput(false);
     } else {
@@ -356,10 +367,12 @@ const Story = () => {
             >
               <p className="text-center">
                 {displayedText.split('').map((char, index) => {
-                  const isNumber = /\d/.test(char);
+                  const transformations = letterTransformations[currentChapter];
+                  const shouldTransform = transformations && transformations[index];
+                  const transformedChar = shouldTransform ? transformations[index] : char;
                   const isLastChar = index === displayedText.length - 1;
 
-                  if (isNumber) {
+                  if (shouldTransform) {
                     return (
                       <motion.span
                         key={index}
@@ -379,7 +392,7 @@ const Story = () => {
                         }}
                         className="inline-block font-bold"
                       >
-                        {char}
+                        {transformedChar}
                       </motion.span>
                     );
                   }
