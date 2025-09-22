@@ -19,6 +19,7 @@ const Story = () => {
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
   const [kiaraSecret, setKiaraSecret] = useState(false);
   const [lastTap, setLastTap] = useState<number>(0);
+  const [firstTapDetected, setFirstTapDetected] = useState(false);
 
   // Detectar si es dispositivo móvil
   useEffect(() => {
@@ -125,9 +126,16 @@ const Story = () => {
   const handleDoubleTap = () => {
     if (currentChapter === 6) { // Solo en el último capítulo
       const now = Date.now();
-      if (now - lastTap < 300) { // 300ms para doble toque
+
+      if (now - lastTap < 800) { // 800ms para doble toque (aún más tiempo)
         setKiaraSecret(true);
+        setFirstTapDetected(false); // Resetear el indicador
+      } else {
+        // Primer toque detectado
+        setFirstTapDetected(true);
+        setTimeout(() => setFirstTapDetected(false), 800); // Ocultar después de 800ms
       }
+
       setLastTap(now);
     }
   };
@@ -327,11 +335,11 @@ const Story = () => {
             {currentChapter === 6 && (
               <motion.p
                 initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 0.6, 0] }}
-                transition={{ duration: 3, repeat: Infinity, delay: 3, repeatDelay: 8 }}
+                animate={{ opacity: [0, 0.7, 0] }}
+                transition={{ duration: 2, repeat: Infinity, delay: 2, repeatDelay: 3 }}
                 className={`${isMobile ? 'text-xs px-4' : 'text-xs'} text-gray-500 text-center mb-4 font-light`}
               >
-                Psss... en este capítulo hay un secreto, ¡búscalo! Desbloquea un nuevo capítulo
+                💡 ¡Secreto oculto! Toca dos veces la imagen para desbloquear
               </motion.p>
             )}
 
@@ -506,6 +514,25 @@ const Story = () => {
             animate={{ scale: 1 }}
           >
             Mantén presionado...
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* Indicador de primer toque del doble toque */}
+      {firstTapDetected && currentChapter === 6 && (
+        <motion.div
+          className="fixed inset-0 bg-blue-500/30 flex items-center justify-center z-30 pointer-events-none"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            className="bg-blue-600 px-6 py-3 rounded-full text-white text-sm font-semibold"
+            initial={{ scale: 0.8, y: 20 }}
+            animate={{ scale: 1, y: 0 }}
+            exit={{ scale: 0.8, y: -20 }}
+          >
+            👆 Toca nuevamente para el secreto
           </motion.div>
         </motion.div>
       )}
