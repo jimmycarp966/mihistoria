@@ -20,6 +20,8 @@ const Story = () => {
   const [kiaraSecret, setKiaraSecret] = useState(false);
   const [firstTapDetected, setFirstTapDetected] = useState(false);
   const [secretTouchTimer, setSecretTouchTimer] = useState(false);
+  const [secretCode, setSecretCode] = useState('');
+  const [showCodeInput, setShowCodeInput] = useState(false);
 
   // Detectar si es dispositivo móvil
   useEffect(() => {
@@ -39,6 +41,7 @@ const Story = () => {
   useEffect(() => {
     setDisplayedText('');
     setShowButtons(false);
+    setShowCodeInput(false);
     const text = chapters[currentChapter].text;
     let i = 0;
     const timer = setInterval(() => {
@@ -47,8 +50,14 @@ const Story = () => {
         i++;
       } else {
         clearInterval(timer);
-        // Mostrar botones después de terminar el typing
-        setTimeout(() => setShowButtons(true), 500);
+        // Mostrar botones o input de código después de terminar el typing
+        setTimeout(() => {
+          if (currentChapter === 6) {
+            setShowCodeInput(true);
+          } else {
+            setShowButtons(true);
+          }
+        }, 500);
       }
     }, 50); // Velocidad de typing (50ms por carácter)
 
@@ -142,6 +151,18 @@ const Story = () => {
   const handleSecretTouchEnd = () => {
     setFirstTapDetected(false);
     setSecretTouchTimer(false);
+  };
+
+  // Verificar código secreto
+  const handleCodeSubmit = () => {
+    if (secretCode === '14082012') {
+      setKiaraSecret(true);
+      setShowCodeInput(false);
+    } else {
+      // Feedback de error - vibrar el input
+      setSecretCode('');
+      // Podríamos agregar aquí alguna animación de error
+    }
   };
 
   // Modo inmersivo para móviles
@@ -345,21 +366,85 @@ const Story = () => {
               </p>
             </motion.div>
 
-            {/* Mensaje secreto sutil en capítulo 7 */}
-            {currentChapter === 6 && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 0.7, 0] }}
-                transition={{ duration: 2, repeat: Infinity, delay: 2, repeatDelay: 3 }}
-                className={`${isMobile ? 'text-xs px-4' : 'text-xs'} text-gray-500 text-center mb-4 font-light`}
-              >
-                💡 Pss... en este capítulo hay un secreto, ¡búscalo! Desbloquea un nuevo capítulo
-              </motion.p>
-            )}
 
-            {/* Navegación condicional: botones en desktop, swipe indicators en móvil */}
-            {!isMobile ? (
-              // Botones para desktop
+            {/* Navegación condicional: input de código en capítulo 7, botones en otros */}
+            {currentChapter === 6 ? (
+              // Input de código secreto para capítulo 7
+              <AnimatePresence>
+                {showCodeInput && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.5 }}
+                    className="w-full max-w-xs mx-auto space-y-4"
+                  >
+                    <div className="text-center">
+                      <p className="text-sm text-gray-400 mb-3">
+                        Hay un capítulo secreto para desbloquear.<br />
+                        En las historias se te mostraron pistas, ingresa acá el resultado.
+                      </p>
+                      <div className="space-y-3">
+                        <input
+                          type="text"
+                          value={secretCode}
+                          onChange={(e) => setSecretCode(e.target.value)}
+                          placeholder="Código secreto"
+                          className="w-full px-4 py-3 bg-gray-800 border-2 border-gray-600 rounded-lg text-white text-center text-lg font-mono focus:border-yellow-400 focus:outline-none transition-colors"
+                          maxLength={8}
+                        />
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={handleCodeSubmit}
+                          className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-lg"
+                        >
+                          Desbloquear ✨
+                        </motion.button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            ) : currentChapter === 6 ? (
+              // Input de código secreto para capítulo 7 (móvil)
+              <AnimatePresence>
+                {showCodeInput && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.5 }}
+                    className="w-full max-w-xs mx-auto space-y-4 px-4"
+                  >
+                    <div className="text-center">
+                      <p className="text-sm text-gray-400 mb-3">
+                        Hay un capítulo secreto para desbloquear.<br />
+                        En las historias se te mostraron pistas, ingresa acá el resultado.
+                      </p>
+                      <div className="space-y-3">
+                        <input
+                          type="text"
+                          value={secretCode}
+                          onChange={(e) => setSecretCode(e.target.value)}
+                          placeholder="Código secreto"
+                          className="w-full px-4 py-3 bg-gray-800 border-2 border-gray-600 rounded-lg text-white text-center text-lg font-mono focus:border-yellow-400 focus:outline-none transition-colors"
+                          maxLength={8}
+                        />
+                        <motion.button
+                          whileTap={{ scale: 0.95 }}
+                          onClick={handleCodeSubmit}
+                          className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-lg"
+                        >
+                          Desbloquear ✨
+                        </motion.button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            ) : !isMobile ? (
+              // Botones para desktop (capítulos que no son 7)
               <AnimatePresence>
                 {showButtons && (
                   <motion.div
