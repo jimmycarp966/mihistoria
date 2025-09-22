@@ -347,7 +347,7 @@ const Story = () => {
               </motion.h1>
             )}
 
-            {/* Texto narrativo con efecto typing */}
+            {/* Texto narrativo con efecto typing y números especiales */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -355,14 +355,50 @@ const Story = () => {
               className={`${isMobile ? 'text-base' : 'text-lg'} text-gray-300 mb-8 leading-relaxed px-2 min-h-[120px] flex items-center`}
             >
               <p className="text-center">
-                {displayedText}
-                <motion.span
-                  animate={{ opacity: [1, 0] }}
-                  transition={{ duration: 0.8, repeat: Infinity, repeatType: "reverse" }}
-                  className="text-yellow-400"
-                >
-                  |
-                </motion.span>
+                {displayedText.split('').map((char, index) => {
+                  const isNumber = /\d/.test(char);
+                  const isLastChar = index === displayedText.length - 1;
+
+                  if (isNumber) {
+                    return (
+                      <motion.span
+                        key={index}
+                        initial={{ scale: 1, color: '#d1d5db' }}
+                        animate={{
+                          scale: [1, 1.3, 1],
+                          color: ['#fbbf24', '#fbbf24', '#fbbf24'],
+                          textShadow: [
+                            '0 0 0px #fbbf24',
+                            '0 0 20px #fbbf24, 0 0 30px #fbbf24',
+                            '0 0 0px #fbbf24'
+                          ]
+                        }}
+                        transition={{
+                          duration: 0.8,
+                          ease: "easeOut"
+                        }}
+                        className="inline-block font-bold"
+                      >
+                        {char}
+                      </motion.span>
+                    );
+                  }
+
+                  return (
+                    <span key={index} className={isLastChar ? 'relative' : ''}>
+                      {char}
+                      {isLastChar && (
+                        <motion.span
+                          animate={{ opacity: [1, 0] }}
+                          transition={{ duration: 0.8, repeat: Infinity, repeatType: "reverse" }}
+                          className="text-yellow-400 absolute"
+                        >
+                          |
+                        </motion.span>
+                      )}
+                    </span>
+                  );
+                })}
               </p>
             </motion.div>
 
