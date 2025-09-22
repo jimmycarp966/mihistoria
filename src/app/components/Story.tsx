@@ -353,7 +353,7 @@ const Story = () => {
                 transition={{ duration: 2, repeat: Infinity, delay: 2, repeatDelay: 3 }}
                 className={`${isMobile ? 'text-xs px-4' : 'text-xs'} text-gray-500 text-center mb-4 font-light`}
               >
-                💡 ¡Secreto oculto! Mantén pulsado la imagen por 1 segundo
+                💡 Pss... en este capítulo hay un secreto, ¡búscalo! Desbloquea un nuevo capítulo
               </motion.p>
             )}
 
