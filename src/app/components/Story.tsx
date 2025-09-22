@@ -26,7 +26,7 @@ const Story = () => {
 
   // Mapa de posiciones donde las letras se transforman en números temporalmente
   const letterTransformations: { [key: number]: { [position: number]: string } } = {
-    0: { 6: '1', 8: '3' }, // Capítulo 1: "Hace t[r]ece" → "Hace t[1]ece", "Hace tre[c]e" → "Hace tre[3]e"
+    0: { 6: '1', 8: '4' }, // Capítulo 1: "Hace t[r]ece" → "Hace t[1]ece", "Hace tre[c]e" → "Hace tre[4]e" (14...)
     1: { 20: '0' }, // Capítulo 2: "charlas infi[n]itas" → "charlas infi[0]itas"
     2: { 15: '8' }, // Capítulo 3: "tantas c[o]sas" → "tantas c[8]sas"
     3: { 5: '2' }, // Capítulo 4: "Hub[o] abrazos" → "Hub[2] abrazos"
@@ -185,7 +185,7 @@ const Story = () => {
 
   // Verificar código secreto
   const handleCodeSubmit = () => {
-    if (secretCode === '13082012') {
+    if (secretCode === '14082012') {
       setKiaraSecret(true);
       setShowCodeInput(false);
     } else {
