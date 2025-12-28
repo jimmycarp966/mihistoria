@@ -39,8 +39,8 @@ const Story = () => {
   useEffect(() => {
     const checkMobile = () => {
       const mobileCheck = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent) ||
-                         ('ontouchstart' in window) ||
-                         window.innerWidth <= 768;
+        ('ontouchstart' in window) ||
+        window.innerWidth <= 768;
       setIsMobile(mobileCheck);
     };
 
@@ -92,6 +92,7 @@ const Story = () => {
     }, 50); // Velocidad de typing (50ms por carácter)
 
     return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentChapter]);
 
   // Navegación con teclado
@@ -203,7 +204,7 @@ const Story = () => {
           if (document.documentElement.requestFullscreen) {
             await document.documentElement.requestFullscreen();
           }
-        } catch (error) {
+        } catch {
           console.log('Fullscreen not supported');
         }
       };
@@ -344,7 +345,7 @@ const Story = () => {
                   handleSecretTouch();
                   onTouchStart(e);
                 }}
-                onTouchEnd={(e) => {
+                onTouchEnd={() => {
                   handleMouseUp();
                   handleSecretTouchEnd();
                   onTouchEnd();
@@ -734,14 +735,14 @@ const Story = () => {
             className="fixed inset-0 bg-gradient-to-br from-pink-900/95 via-purple-900/95 to-yellow-900/95 flex items-center justify-center z-50"
             onClick={() => setKiaraSecret(false)}
           >
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0, rotate: -10 }}
-                animate={{ scale: 1, opacity: 1, rotate: 0 }}
-                exit={{ scale: 0.8, opacity: 0, rotate: 10 }}
-                transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                className={`${isMobile ? 'p-6 mx-2' : 'p-8 mx-4'} bg-white/10 backdrop-blur-sm rounded-2xl max-w-md text-center shadow-2xl border border-white/20`}
-                onClick={(e) => e.stopPropagation()}
-              >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0, rotate: -10 }}
+              animate={{ scale: 1, opacity: 1, rotate: 0 }}
+              exit={{ scale: 0.8, opacity: 0, rotate: 10 }}
+              transition={{ type: "spring", stiffness: 200, damping: 20 }}
+              className={`${isMobile ? 'p-6 mx-2' : 'p-8 mx-4'} bg-white/10 backdrop-blur-sm rounded-2xl max-w-md text-center shadow-2xl border border-white/20`}
+              onClick={(e) => e.stopPropagation()}
+            >
               {/* Imagen de Kiara */}
               <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
@@ -814,10 +815,23 @@ const Story = () => {
                 whileHover={!isMobile ? { scale: 1.05 } : {}}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setKiaraSecret(false)}
-                className={`${isMobile ? 'mt-4 py-3 px-6 text-sm' : 'mt-6 py-3 px-8'} bg-gradient-to-r from-pink-500 to-yellow-500 hover:from-pink-600 hover:to-yellow-600 text-white font-semibold rounded-full transition-all duration-300 shadow-lg hover:shadow-xl`}
+                className={`${isMobile ? 'mt-4 py-2 px-4 text-sm' : 'mt-6 py-2 px-6'} bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-full transition-all duration-300 shadow-lg`}
               >
-                💕 Volver
+                ← Volver
               </motion.button>
+
+              {/* Botón Segunda Parte */}
+              <motion.a
+                href="/fases"
+                whileHover={!isMobile ? { scale: 1.05 } : {}}
+                whileTap={{ scale: 0.95 }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className={`${isMobile ? 'mt-3 py-3 px-6 text-sm' : 'mt-4 py-3 px-8'} bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white font-semibold rounded-full transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2`}
+              >
+                🌙 Segunda Parte
+              </motion.a>
             </motion.div>
           </motion.div>
         )}
