@@ -820,18 +820,25 @@ const Story = () => {
                 ← Volver
               </motion.button>
 
-              {/* Botón Segunda Parte */}
-              <motion.a
-                href="/fases"
-                whileHover={!isMobile ? { scale: 1.05 } : {}}
-                whileTap={{ scale: 0.95 }}
-                initial={{ opacity: 0, y: 10 }}
+              {/* Mensaje de desbloqueo y Botón Segunda Parte */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className={`${isMobile ? 'mt-3 py-3 px-6 text-sm' : 'mt-4 py-3 px-8'} bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white font-semibold rounded-full transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2`}
+                transition={{ delay: 0.8 }}
+                className="mt-6 text-center"
               >
-                🌙 Segunda Parte
-              </motion.a>
+                <p className={`${isMobile ? 'text-sm' : 'text-base'} text-yellow-300 font-medium mb-3`}>
+                  ✨ ¡Desbloqueaste una segunda parte! ✨
+                </p>
+                <motion.a
+                  href="/fases"
+                  whileHover={!isMobile ? { scale: 1.05 } : {}}
+                  whileTap={{ scale: 0.95 }}
+                  className={`${isMobile ? 'py-3 px-6 text-sm' : 'py-3 px-8'} inline-flex bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white font-semibold rounded-full transition-all duration-300 shadow-lg hover:shadow-xl items-center justify-center gap-2`}
+                >
+                  🌙 Ir a "Fases"
+                </motion.a>
+              </motion.div>
             </motion.div>
           </motion.div>
         )}
